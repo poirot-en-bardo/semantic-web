@@ -14,6 +14,73 @@
             margin: 10px;
         }
     </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            getData();
+        });
+
+        function send1() {
+            agencyId = null;
+            cityId = null;
+            var sendObject;
+            newData = $("#formular");
+            serializedData = newData.serialize(); //sau cu JSON.stringify?
+            formValues = Object.fromEntries(new FormData($("#formular")[0]));
+            $.getJSON("http://localhost:4000/agencies", function (agencies) {
+                agencies.forEach(agency => {
+                        if (agency.name == formValues.agency) {
+                            agencyId = agency.id;
+                        }
+                    }
+                )
+            })
+            $.getJSON("http://localhost:4000/cities", function (cities) {
+                cities.forEach(city => {
+                        if (city.name == formValues.city)
+                            cityId = city.id;
+                    }
+                )
+                sendObject = {"agencyId": agencyId, "cityId": cityId, price: parseInt(formValues.price, 10)};
+
+                console.log(sendObject);
+                config = {
+                    url: "http://localhost:4000/tours",
+                    type: "POST",
+                    data: JSON.stringify(sendObject),
+                    contentType: "application/json",
+                    succes: processResponse1
+                }
+                $.ajax(config);
+            })
+
+
+
+
+
+        }
+
+        function processResponse1(response) {
+            console.log("Inserare date " + response);
+
+        }
+
+        function getData() {
+            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (json) {
+                for (i = 0; i <= json.length; i++) {
+                    line = "<tr>" +
+                        "<td>" + json[i].agency.name + "</td>" +
+                        "<td>" + json[i].agency.phone + "</td>" +
+                        "<td>" + json[i].city.name + "</td>" +
+                        "<td>" + json[i].city.country + "</td>" +
+                        "<td>" + json[i].price + "</td>" +
+                        "</tr>";
+                    tableBody = $("#tabel1 tbody");
+                    tableBody.append(line);
+                }
+            });
+        }
+    </script>
 </head>
 <body>
 
@@ -23,26 +90,25 @@
 <h2>Introduceti datele:</h2>
 
 <form id="formular">
-    Camp1 <input type="text" name="c1"><br/>
-    Camp2 <input type="text" name="c2"><br/>
-    Camp3 <input type="text" name="c3"><br/>
+    Agentie <input type="text" name="agency"><br/>
+    Oras <input type="text" name="city"><br/>
+    Pret excursie <input type="number" name="price"><br/>
 </form>
 
 <div>
-    <button class="sendButton" onclick="trimite1()">Trimite catre Serverul X</button>
+    <button class="sendButton" onclick="send1()">Trimite catre Serverul X</button>
 </div>
 
 <div>
     <h2>Date returnate:</h2>
-    <table>
+    <table id="tabel1">
         <tr>
-            <th>Camp1</th>
-            <th>Camp2</th>
-            <th>Camp3</th>
-            <th>Camp4</th>
+            <th>Agentie</th>
+            <th>Telefon</th>
+            <th>Oras</th>
+            <th>Tara</th>
+            <th>Pret excursie</th>
         </tr>
-        <tr></tr>
-        <tr></tr>
         <tr></tr>
     </table>
 </div>
@@ -51,12 +117,13 @@
 </div>
 
 <div>
-    <table>
+    <table id="tabel2">
         <tr>
-            <th>Camp1</th>
-            <th>Camp2</th>
-            <th>Camp3</th>
-            <th>Camp4</th>
+            <th>Agentie</th>
+            <th>Telefon</th>
+            <th>Oras</th>
+            <th>Tara</th>
+            <th>Pret excursie</th>
         </tr>
         <tr></tr>
         <tr></tr>
