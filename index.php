@@ -21,8 +21,8 @@
         });
 
         function send1() {
-            agencyId = null;
-            cityId = null;
+            var agencyId = null;
+            var cityId = null;
             var sendObject;
             newData = $("#formular");
             serializedData = newData.serialize(); //sau cu JSON.stringify?
@@ -41,17 +41,35 @@
                             cityId = city.id;
                     }
                 )
-                sendObject = {"agencyId": agencyId, "cityId": cityId, price: parseInt(formValues.price, 10)};
+                $.getJSON("http://localhost:4000/greatestId", function (id){
+                    postId = id.value + 1;
+                    sendObject = {"id": postId, "agencyId": agencyId, "cityId": cityId, price: parseInt(formValues.price, 10)};
+                    config = {
+                        url: "http://localhost:4000/tours",
+                        type: "POST",
+                        data: JSON.stringify(sendObject),
+                        contentType: "application/json",
+                        succes: processResponse1
+                    }
+                    $.ajax(config);
 
-                console.log(sendObject);
-                config = {
-                    url: "http://localhost:4000/tours",
-                    type: "POST",
-                    data: JSON.stringify(sendObject),
-                    contentType: "application/json",
-                    succes: processResponse1
-                }
-                $.ajax(config);
+                    $.ajax({
+                        url: "http://localhost:4000/greatestId",
+                        type: "PUT",
+                        data: JSON.stringify({"value":postId}),
+                        contentType: "application/json",
+                        succes: function(result){
+                            console.log(result);
+                        }
+                    })
+
+
+                })
+
+
+
+
+
             })
 
 

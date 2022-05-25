@@ -1,38 +1,71 @@
 {
-"agencies": [
-{"id": 1,
-"name": "Aero Trip",
-"phone": "0724315423"
-},
-{"id": 2,
-"name": "Go Travel",
-"phone": "0724315422"},
-{"id": 3,
-"name": "Sejourney",
-"phone": "0724315452"}
-],
-
-"cities": [
-{"id": 1,
-"name": "Paris",
-"country":"France"},
-{"id": 2,
-"name": "Rome",
-"country":"Italy"},
-{"id": 3,
-"name": "London",
-"country":"United Kingdom"}
-],
-
-"tours": [
-{"agencyId":1,
-"cityId":1,
-"price":700},
-{"agencyId":1,
-"cityId":2,
-"price":900},
-{"agencyId":2,
-"cityId":2,
-"price":500}
-]
+  "agencies": [
+    {
+      "id": 1,
+      "name": "Aero Trip",
+      "phone": "0724315423"
+    },
+    {
+      "id": 2,
+      "name": "Go Travel",
+      "phone": "0724315422"
+    },
+    {
+      "id": 3,
+      "name": "Sejourney",
+      "phone": "0724315452"
+    }
+  ],
+  "cities": [
+    {
+      "id": 1,
+      "name": "Paris",
+      "country": "France"
+    },
+    {
+      "id": 2,
+      "name": "Rome",
+      "country": "Italy"
+    },
+    {
+      "id": 3,
+      "name": "London",
+      "country": "United Kingdom"
+    }
+  ],
+  "tours": [
+    {
+      "id": 1,
+      "agencyId": 1,
+      "cityId": 1,
+      "price": 700
+    },
+    {
+      "id": 2,
+      "agencyId": 1,
+      "cityId": 2,
+      "price": 900
+    },
+    {
+      "id": 3,
+      "agencyId": 2,
+      "cityId": 2,
+      "price": 500
+    },
+    {
+      "id": 4,
+      "agencyId": 3,
+      "cityId": 1,
+      "price": 22
+    },
+    {
+      "id": 5,
+      "agencyId": 3,
+      "cityId": 2,
+      "price": 12321
+    }
+  ],
+  "greatestId": {
+    "value": 5
+  }
 }
