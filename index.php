@@ -35,75 +35,88 @@
             getData();
         });
 
+        let agencies;
+        let cities;
+
         function send1() {
-            var agencyId = null;
-            var cityId = null;
-            var sendObject;
-            formValues = Object.fromEntries(new FormData($("#formular")[0]));
-            $.getJSON("http://localhost:4000/agencies", function (agencies) {
-                agencies.forEach(agency => {
-                        if (agency.name == formValues.agency) {
-                            agencyId = agency.id;
-                        }
-                    }
-                )
+            let selectedAgency = null;
+            let selectedCity = null;
+            let sendObject;
+            let formValues = Object.fromEntries(new FormData($("#formular")[0]));
+
+            agencies.forEach(agency => {
+                if(agency.id == formValues.agency) {
+                    selectedAgency = agency;
+                }
             })
-            $.getJSON("http://localhost:4000/cities", function (cities) {
-                cities.forEach(city => {
-                        if (city.name == formValues.city)
-                            cityId = city.id;
-                    }
-                )
-                $.getJSON("http://localhost:4000/greatestId", function (id) {
-                    postId = id.value + 1;
-                    console.log(postId);
-                    sendObject = {
-                        "id": postId,
-                        "agencyId": agencyId,
-                        "cityId": cityId,
-                        price: parseInt(formValues.price, 10)
-                    };
-
-                    $.ajax({
-                        url: "http://localhost:4000/tours",
-                        type: "POST",
-                        data: JSON.stringify(sendObject),
-                        contentType: "application/json",
-                        succes: processResponse1
-                    });
-
-                    $.ajax({
-                        url: "http://localhost:4000/greatestId",
-                        type: "PUT",
-                        data: JSON.stringify({"value": postId}),
-                        contentType: "application/json",
-                        succes: function (result) {
-                            console.log(result);
-                        }
-                    })
-                })
+            cities.forEach(city => {
+                if(city.id == formValues.city)
+                    selectedCity = city;
             })
-        }
 
-        function processResponse1(response) {
-            console.log("Inserare date " + response);
 
-        }
-
-        function getData() {
-            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (json) {
-                for (i = 0; i <= json.length; i++) {
+            sendObject = {
+                "agencyId": selectedAgency.id,
+                "cityId": selectedCity.id,
+                price: parseInt(formValues.price, 10)
+            };
+            $.ajax({
+                url: "http://localhost:4000/tours",
+                type: "POST",
+                data: JSON.stringify(sendObject),
+                contentType: "application/json",
+                success: function (response) {
                     line = "<tr>" +
-                        "<td>" + json[i].agency.name + "</td>" +
-                        "<td>" + json[i].agency.phone + "</td>" +
-                        "<td>" + json[i].city.name + "</td>" +
-                        "<td>" + json[i].city.country + "</td>" +
-                        "<td>" + json[i].price + "</td>" +
+                        "<td>" + selectedAgency?.name + "</td>" +
+                        "<td>" + selectedAgency.phone + "</td>" +
+                        "<td>" + selectedCity?.name + "</td>" +
+                        "<td>" + selectedCity?.country + "</td>" +
+                        "<td>" + response.price + "</td>" +
                         "</tr>";
                     tableBody = $("#tabel1 tbody");
                     tableBody.append(line);
                 }
             });
+        }
+
+
+        function getData() {
+
+            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (tours) {
+                tours.forEach(tour => {
+                    line = "<tr>" +
+                        "<td>" + tour.agency.name + "</td>" +
+                        "<td>" + tour.agency.phone + "</td>" +
+                        "<td>" + tour.city.name + "</td>" +
+                        "<td>" + tour.city.country + "</td>" +
+                        "<td>" + tour.price + "</td>" +
+                        "</tr>";
+                    tableBody = $("#tabel1 tbody");
+                    tableBody.append(line);
+                })
+            });
+
+            $.getJSON("http://localhost:4000/agencies", function (items) {
+                agencies = items;
+                $.each(agencies, function (index, agency) {
+                    var $option = $("<option/>", {
+                        value: agency.id,
+                        text: agency.name
+                    });
+                    $('#agency').append($option);
+                });
+            })
+
+            $.getJSON("http://localhost:4000/cities", function (items) {
+                cities = items;
+                $.each(cities, function (index, city) {
+                    var $option = $("<option/>", {
+                        value: city.id,
+                        text: city.name
+                    });
+                    $('#city').append($option);
+                });
+            })
         }
     </script>
 </head>
@@ -115,13 +128,19 @@
 <h2>Introduceti datele:</h2>
 
 <form id="formular">
-    Agentie <input type="text" name="agency"><br/>
-    Oras <input type="text" name="city"><br/>
-    Pret excursie <input type="number" name="price"><br/>
+    <label for="agency">Selectati o agentie:</label>
+    <select name="agency" id="agency"> </select> <br/>
+
+    <label for="city">Selectati un oras:</label>
+    <select name="city" id="city"> </select> <br/>
+
+    <label for="price">Pret excursie:</label>
+    <input type="number" name="price"><br/>
+
 </form>
 
 <div>
-    <button class="sendButton" onclick="send1()">Trimite catre Serverul X</button>
+    <button class="sendButton" onclick="send1()">Trimite catre JSON Server</button>
 </div>
 
 <div>
@@ -138,7 +157,7 @@
     </table>
 </div>
 <div>
-    <button class="sendButton" onclick="trimite2()">Trimite catre Serverul Y</button>
+    <button class="sendButton" onclick="send2()">Trimite catre Serverul Y</button>
 </div>
 
 <div>
