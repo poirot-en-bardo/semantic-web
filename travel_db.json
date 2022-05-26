@@ -63,48 +63,6 @@
       "agencyId": 3,
       "cityId": 2,
       "price": 123
-    },
-    {
-      "agencyId": 2,
-      "cityId": 3,
-      "price": 231,
-      "id": 6
-    },
-    {
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 3222,
-      "id": 7
-    },
-    {
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 4343,
-      "id": 8
-    },
-    {
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 4343,
-      "id": 9
-    },
-    {
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 4343,
-      "id": 10
-    },
-    {
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 43432,
-      "id": 11
-    },
-    {
-      "agencyId": 1,
-      "cityId": 1,
-      "price": 200,
-      "id": 12
     }
   ]
 }
