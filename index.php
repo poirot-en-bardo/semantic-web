@@ -20,24 +20,31 @@
             getData();
         });
 
+        let agencies;
+        let cities;
 
         function send1() {
-            var agencyId = null;
-            var cityId = null;
-            var sendObject;
+            let agencyId = null;
+            let agencyPhone = "";
+            let cityId = null;
+            let country = "";
+            let sendObject;
             formValues = Object.fromEntries(new FormData($("#formular")[0]));
             $.getJSON("http://localhost:4000/agencies", function (agencies) {
                 agencies.forEach(agency => {
-                        if (agency.name == formValues.agency) {
+                        if (agency.name === formValues.agency) {
                             agencyId = agency.id;
+                            agencyPhone = agency.phone;
                         }
                     }
                 )
             })
             $.getJSON("http://localhost:4000/cities", function (cities) {
                 cities.forEach(city => {
-                        if (city.name == formValues.city)
+                        if (city.name === formValues.city) {
                             cityId = city.id;
+                            country = city.country;
+                        }
                     }
                 )
                 sendObject = {
@@ -50,31 +57,62 @@
                     type: "POST",
                     data: JSON.stringify(sendObject),
                     contentType: "application/json",
-                    success: processResponse1
+                    success: function (response) {
+                        line = "<tr>" +
+                            "<td>" + formValues.agency + "</td>" +
+                            "<td>" + agencyPhone + "</td>" +
+                            "<td>" + formValues.city + "</td>" +
+                            "<td>" + country + "</td>" +
+                            "<td>" + response.price + "</td>" +
+                            "</tr>";
+                        tableBody = $("#tabel1 tbody");
+                        tableBody.append(line);
+                    }
                 });
 
             })
         }
 
         function processResponse1(response) {
-            console.log(response);
-            //insert into table
         }
 
         function getData() {
-            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (json) {
-                for (i = 0; i <= json.length; i++) {
-                    line = "<tr>" +
-                        "<td>" + json[i].agency.name + "</td>" +
-                        "<td>" + json[i].agency.phone + "</td>" +
-                        "<td>" + json[i].city.name + "</td>" +
-                        "<td>" + json[i].city.country + "</td>" +
-                        "<td>" + json[i].price + "</td>" +
-                        "</tr>";
-                    tableBody = $("#tabel1 tbody");
-                    tableBody.append(line);
-                }
+
+            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (tours) {
+               tours.forEach(tour => {
+                   line = "<tr>" +
+                       "<td>" + tour.agency.name + "</td>" +
+                       "<td>" + tour.agency.phone + "</td>" +
+                       "<td>" + tour.city.name + "</td>" +
+                       "<td>" + tour.city.country + "</td>" +
+                       "<td>" + tour.price + "</td>" +
+                       "</tr>";
+                   tableBody = $("#tabel1 tbody");
+                   tableBody.append(line);
+               })
             });
+
+            $.getJSON("http://localhost:4000/agencies", function (items) {
+                agencies = items;
+                $.each(agencies, function (index, agency) {
+                    var $option = $("<option/>", {
+                        value: index,
+                        text: agency.name
+                    });
+                    $('#agentii').append($option);
+                });
+            })
+
+            $.getJSON("http://localhost:4000/cities", function (items) {
+                cities = items;
+                $.each(cities, function (index, city) {
+                    var $option = $("<option/>", {
+                        value: index,
+                        text: city.name
+                    });
+                    $('#orase').append($option);
+                });
+            })
         }
     </script>
 </head>
@@ -86,9 +124,18 @@
 <h2>Introduceti datele:</h2>
 
 <form id="formular">
+    <label for="agentii">Selectati o agentie:</label>
+    <select name="agentii" id="agentii"> </select> <br/>
+
+    <label for="orase">Selectati un oras:</label>
+    <select name="orase" id="orase"> </select> <br/>
+
+    <label for="price">Pret excursie:</label>
+    <input type="number" name="price"><br/>
+
     Agentie <input type="text" name="agency"><br/>
     Oras <input type="text" name="city"><br/>
-    Pret excursie <input type="number" name="price"><br/>
+
 </form>
 
 <div>
