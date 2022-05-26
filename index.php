@@ -14,6 +14,21 @@
             margin: 10px;
         }
     </style>
+    <?php
+    function CreateGraphs()
+    {
+        require 'vendor/autoload.php';
+        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
+        $graf=new EasyRdf\Graph("http://balicaprichici.ro#grafAgencies");
+        $prefixe=new EasyRdf\RdfNamespace();
+        $prefixe->setDefault("http://balicaprichici.ro#");
+        $graf->addResource("Irina","schema:knows","Petru");
+        $graf->addResource("Irina","schema:knows","Pavel");
+        $graf->add("Irina","varsta","22");
+        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/grafuri/statements");
+        print $client->insert($graf,"http://buchmann.ro#grafNou2");
+    }
+    ?>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $(document).ready(function () {

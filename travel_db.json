@@ -111,9 +111,21 @@
       "agencyId": 3,
       "cityId": 2,
       "price": 4322
+    },
+    {
+      "id": 14,
+      "agencyId": 2,
+      "cityId": 2,
+      "price": 5
+    },
+    {
+      "id": 15,
+      "agencyId": 2,
+      "cityId": 1,
+      "price": 56
     }
   ],
   "greatestId": {
-    "value": 13
+    "value": 15
   }
 }
