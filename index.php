@@ -167,10 +167,11 @@
 <div>
     <table>
         <tr>
-            <th>Camp1</th>
-            <th>Camp2</th>
-            <th>Camp3</th>
-            <th>Camp4</th>
+            <th>Agentie</th>
+            <th>Telefon</th>
+            <th>Oras</th>
+            <th>Tara</th>
+            <th>Pret excursie</th>
         </tr>
         <tr></tr>
         <tr></tr>
