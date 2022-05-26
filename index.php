@@ -20,6 +20,7 @@
             getData();
         });
 
+
         function send1() {
             var agencyId = null;
             var cityId = null;
@@ -39,40 +40,25 @@
                             cityId = city.id;
                     }
                 )
-                $.getJSON("http://localhost:4000/greatestId", function (id) {
-                    postId = id.value + 1;
-                    console.log(postId);
-                    sendObject = {
-                        "id": postId,
-                        "agencyId": agencyId,
-                        "cityId": cityId,
-                        price: parseInt(formValues.price, 10)
-                    };
+                sendObject = {
+                    "agencyId": agencyId,
+                    "cityId": cityId,
+                    price: parseInt(formValues.price, 10)
+                };
+                $.ajax({
+                    url: "http://localhost:4000/tours",
+                    type: "POST",
+                    data: JSON.stringify(sendObject),
+                    contentType: "application/json",
+                    success: processResponse1
+                });
 
-                    $.ajax({
-                        url: "http://localhost:4000/tours",
-                        type: "POST",
-                        data: JSON.stringify(sendObject),
-                        contentType: "application/json",
-                        succes: processResponse1
-                    });
-
-                    $.ajax({
-                        url: "http://localhost:4000/greatestId",
-                        type: "PUT",
-                        data: JSON.stringify({"value": postId}),
-                        contentType: "application/json",
-                        succes: function (result) {
-                            console.log(result);
-                        }
-                    })
-                })
             })
         }
 
         function processResponse1(response) {
-            console.log("Inserare date " + response);
-
+            console.log(response);
+            //insert into table
         }
 
         function getData() {
@@ -106,7 +92,7 @@
 </form>
 
 <div>
-    <button class="sendButton" onclick="send1()">Trimite catre Serverul X</button>
+    <button class="sendButton" onclick="send1()">Trimite catre JSON Server</button>
 </div>
 
 <div>
@@ -123,7 +109,7 @@
     </table>
 </div>
 <div>
-    <button class="sendButton" onclick="trimite2()">Trimite catre Serverul Y</button>
+    <button class="sendButton" onclick="send2()">Trimite catre Serverul Y</button>
 </div>
 
 <div>

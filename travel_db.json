@@ -62,58 +62,13 @@
       "id": 5,
       "agencyId": 3,
       "cityId": 2,
-      "price": 12321
+      "price": 123
     },
     {
-      "id": 6,
-      "agencyId": 3,
-      "cityId": 3,
-      "price": 132
-    },
-    {
-      "id": 7,
       "agencyId": 2,
       "cityId": 3,
-      "price": 4343
-    },
-    {
-      "id": 8,
-      "agencyId": 1,
-      "cityId": 3,
-      "price": 12
-    },
-    {
-      "id": 9,
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 432
-    },
-    {
-      "id": 10,
-      "agencyId": 3,
-      "cityId": 2,
-      "price": 23
-    },
-    {
-      "id": 11,
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 231
-    },
-    {
-      "id": 12,
-      "agencyId": 3,
-      "cityId": 1,
-      "price": 4322
-    },
-    {
-      "id": 13,
-      "agencyId": 3,
-      "cityId": 2,
-      "price": 4322
+      "price": 231,
+      "id": 6
     }
-  ],
-  "greatestId": {
-    "value": 13
-  }
+  ]
 }
