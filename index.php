@@ -23,12 +23,13 @@
         $prefixe = new EasyRdf\RdfNamespace();
         $prefixe->setDefault("http://balicaprichici.ro#");
         //$data=json_decode($rezultatJSON)->results->bindings;
-        $graf->addResource("Irina","schema:knows","Petru");
-        $graf->addResource("Irina","schema:knows","Pavel");
-        $graf->add("Irina","varsta","22");
-        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
-        print $client->insert($graf,"http://balicaprichici.ro#grafNou2");
+        $graf->addResource("Irina", "schema:knows", "Petru");
+        $graf->addResource("Irina", "schema:knows", "Pavel");
+        $graf->add("Irina", "varsta", "22");
+        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
+        print $client->insert($graf, "http://balicaprichici.ro#grafNou2");
     }
+
     ?>
 
 
@@ -73,14 +74,9 @@
                 data: JSON.stringify(sendObject),
                 contentType: "application/json",
                 success: function (response) {
-                    line = "<tr>" +
-                        "<td>" + selectedAgency?.name + "</td>" +
-                        "<td>" + selectedAgency?.phone + "</td>" +
-                        "<td>" + selectedCity?.name + "</td>" +
-                        "<td>" + selectedCity?.country + "</td>" +
-                        "<td>" + response.price + "</td>" +
-                        "</tr>";
-                    tableBody = $("#tabel1 tbody");
+                    line = addLine(selectedAgency?.name, selectedAgency?.phone, selectedCity?.name, selectedCity?.country,
+                        response.price)
+                    tableBody = $("#table1 tbody");
                     tableBody.append(line);
 
                     tours.push({"agencyId": selectedAgency.id, "cityId": selectedCity.id, "price": response.price});
@@ -89,7 +85,7 @@
         }
 
 
-        function addline (agname, agphone, ctname, ctcountry, price) {
+        function addLine(agname, agphone, ctname, ctcountry, price) {
             line = "<tr>" +
                 "<td>" + agname + "</td>" +
                 "<td>" + agphone + "</td>" +
@@ -99,66 +95,190 @@
                 "</tr>";
             return line;
         }
+
         async function send2() {
-            const [a,c,t] = await Promise.all([insertAgencies(), insertCities(), insertTours()]);
-            //inserare date in tabel
+            await Promise.all([graphAgencies(), graphCities(), graphTours()]);
+
+            console.log(agencies2);
+            console.log(cities2);
+            console.log(tours2);
+            $("#table2 > tbody:last").children( 'tr:not(:first)' ).remove();
+            for (i = 0; i < tours2.length; i++) {
+                joinQuery = JSON.stringify({
+                    query: `{Tour(id: "${i}"){price Agency{name phone} City{name country}}}`
+                })
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: joinQuery,
+                    contentType: "application/json",
+                    success: function (response) {
+                        console.log(response)
+                        agency = response.data.Tour.Agency;
+                        city = response.data.Tour.City;
+                        line = addLine(agency?.name, agency?.phone, city?.name, city?.country, response.data.Tour?.price);
+                        tableBody = $("#table2 tbody");
+                        tableBody.append(line);
+                    }
+                })
+            }
         }
 
-        async function insertAgencies(){
-            for (i = 1; i < agencies.length; i++) {
-                obiectInterogare = {query: `mutation {createAgency(name:"${agencies[i].name}", phone:"${agencies[i].phone}") {id name phone}}`}
-                textInterogare = JSON.stringify(obiectInterogare)
+        async function graphAgencies() {
+            console.log("ag1")
+            let allAgencies = JSON.stringify({
+                query: `{_allAgenciesMeta{count}}`
+            })
+            $.ajax({
+                url: "http://localhost:3000",
+                type: "POST",
+                data: allAgencies,
+                contentType: "application/json",
+                success: insertAgencies
+            })
+
+            return 1;
+        }
+
+        function insertAgencies(response) {
+            console.log("ag2")
+            agenciesNo = response.data._allAgenciesMeta.count;
+
+            for (i = agenciesNo; i >= 0; i--) {
+                deleteQuery = JSON.stringify({
+                    query: `mutation {removeAgency(id: "${i}"){name}}`
+                })
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: deleteQuery,
+                    contentType: "application/json"
+                })
+            }
+
+            agencies2 = []
+            for (i = 0; i < agencies.length; i++) {
+                postQuery = JSON.stringify({
+                    query: `mutation {createAgency(name:"${agencies[i].name}",
+                                        phone:"${agencies[i].phone}") {id name phone}}`
+                })
 
                 $.ajax({
                     url: "http://localhost:3000",
                     type: "POST",
-                    data: textInterogare,
+                    data: postQuery,
                     contentType: "application/json",
                     success: function (response) {
                         agencies2.push(response.data.createAgency);
                     }
                 });
             }
+        }
+
+        async function graphCities() {
+            console.log("ct1")
+            let allCities = JSON.stringify({
+                query: `{_allCitiesMeta{count}}`
+            })
+            $.ajax({
+                url: "http://localhost:3000",
+                type: "POST",
+                data: allCities,
+                contentType: "application/json",
+                success: insertCities
+            })
+
             return 1;
         }
 
-        async function insertCities(){
-            for (i = 1; i < cities.length; i++) {
-                obiectInterogare = {query: `mutation {createCity(name:"${cities[i].name}",
-                country:"${cities[i].country}") {id name country}}`}
-                textInterogare = JSON.stringify(obiectInterogare)
+        function insertCities(response) {
+            console.log("ct2")
+            citiesNo = response.data._allCitiesMeta.count;
+
+            for (i = citiesNo; i >= 0; i--) {
+                deleteQuery = JSON.stringify({
+                    query: `mutation {removeCity(id: "${i}"){name}}`
+                })
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: deleteQuery,
+                    contentType: "application/json"
+                })
+            }
+
+            cities2 = []
+            for (i = 0; i < cities.length; i++) {
+                postQuery = JSON.stringify({
+                    query: `mutation {createCity(name:"${cities[i].name}",
+                            country:"${cities[i].country}") {id name country}}`
+                })
 
                 $.ajax({
                     url: "http://localhost:3000",
                     type: "POST",
-                    data: textInterogare,
+                    data: postQuery,
                     contentType: "application/json",
-                    success: function(response) {
+                    success: function (response) {
                         cities2.push(response.data.createCity);
                     }
                 });
             }
+        }
+
+
+        async function graphTours() {
+            console.log("to1")
+            let allTours = JSON.stringify({
+                query: `{_allToursMeta{count}}`
+            })
+            $.ajax({
+                url: "http://localhost:3000",
+                type: "POST",
+                data: allTours,
+                contentType: "application/json",
+                success: insertTours
+            })
+
             return 1;
         }
 
-        async function insertTours(){
-            for(i = 1; i < tours.length; i++) {
-                obiectInterogare = {query: `mutation {createTour(agency_id:"${tours[i].agencyId}",
-                city_id:"${tours[i].cityId}", price:${tours[i].price}) {agency_id city_id price}}`}
-                textInterogare = JSON.stringify(obiectInterogare)
+
+        function insertTours(response) {
+            console.log("to2")
+            toursNo = response.data._allToursMeta.count;
+
+            for (i = toursNo; i >= 0; i--) {
+                deleteQuery = JSON.stringify({
+                    query: `mutation {removeTour(id: "${i}"){id}}`
+                })
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: deleteQuery,
+                    contentType: "application/json"
+                })
+            }
+
+            tours2 = []
+            for (i = 0; i < tours.length; i++) {
+                postQuery = JSON.stringify({
+                    query: `mutation {createTour(agency_id:"${tours[i].agencyId}",
+                            city_id:"${tours[i].cityId}", price:${tours[i].price}) {agency_id city_id price}}`
+                })
 
                 $.ajax({
                     url: "http://localhost:3000",
                     type: "POST",
-                    data: textInterogare,
+                    data: postQuery,
                     contentType: "application/json",
-                    success: function(response) {
+                    success: function (response) {
                         tours2.push(response.data.createTour);
                     }
                 });
             }
-            return 1;
         }
+
 
         function procesareRaspuns(raspuns) {
             // console.log(raspuns);
@@ -194,17 +314,11 @@
 
             $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (items) {
                 items.forEach(tour => {
-                    line = "<tr>" +
-                        "<td>" + tour.agency.name + "</td>" +
-                        "<td>" + tour.agency.phone + "</td>" +
-                        "<td>" + tour.city.name + "</td>" +
-                        "<td>" + tour.city.country + "</td>" +
-                        "<td>" + tour.price + "</td>" +
-                        "</tr>";
-                    tableBody = $("#tabel1 tbody");
+                    line = addLine(tour.agency.name, tour.agency.phone, tour.city.name, tour.city.country, tour.price)
+                    tableBody = $("#table1 tbody");
                     tableBody.append(line);
 
-                    tours.push({"agencyId": tour.agency.id, "cityId":tour.city.id, "price":tour.price})
+                    tours.push({"agencyId": tour.agency.id, "cityId": tour.city.id, "price": tour.price})
                 })
             });
 
@@ -257,7 +371,7 @@
 
 <div>
     <h2>Date returnate:</h2>
-    <table id="tabel1">
+    <table id="table1">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
@@ -273,7 +387,7 @@
 </div>
 
 <div>
-    <table id="tabel2">
+    <table id="table2">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
@@ -292,7 +406,7 @@
 </div>
 
 <div>
-    <table>
+    <table id="table3">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
