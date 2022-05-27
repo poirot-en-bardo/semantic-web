@@ -45,6 +45,10 @@
         let agencies2 = [];
         let cities2 = [];
         let tours2 = [];
+        const json_link = "http://localhost:4000"
+        const graph_link = "http://localhost:3000"
+        const rdf_link = "http://localhost:8080"
+
 
         function send1() {
             let selectedAgency = null;
@@ -69,7 +73,7 @@
                 price: parseInt(formValues.price, 10)
             };
             $.ajax({
-                url: "http://localhost:4000/tours",
+                url: json_link + "/tours",
                 type: "POST",
                 data: JSON.stringify(sendObject),
                 contentType: "application/json",
@@ -99,9 +103,9 @@
         async function send2() {
             await Promise.all([graphAgencies(), graphCities(), graphTours()]);
 
-            // console.log(agencies2);
-            // console.log(cities2);
-            // console.log(tours2);
+            console.log(agencies2);
+            console.log(cities2);
+            console.log(tours2);
 
             $("#table2 > tbody:last").children('tr:not(:first)').remove();
             for (i = 0; i < tours2.length; i++) {
@@ -109,7 +113,7 @@
                     query: `{Tour(id: "${i}"){price Agency{name phone} City{name country}}}`
                 })
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: joinQuery,
                     contentType: "application/json",
@@ -129,7 +133,7 @@
                 query: `{_allAgenciesMeta{count}}`
             })
             $.ajax({
-                url: "http://localhost:3000",
+                url: graph_link,
                 type: "POST",
                 data: allAgencies,
                 contentType: "application/json",
@@ -147,7 +151,7 @@
                     query: `mutation {removeAgency(id: "${i}"){name}}`
                 })
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: deleteQuery,
                     contentType: "application/json"
@@ -162,7 +166,7 @@
                 })
 
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: postQuery,
                     contentType: "application/json",
@@ -178,7 +182,7 @@
                 query: `{_allCitiesMeta{count}}`
             })
             $.ajax({
-                url: "http://localhost:3000",
+                url: graph_link,
                 type: "POST",
                 data: allCities,
                 contentType: "application/json",
@@ -196,7 +200,7 @@
                     query: `mutation {removeCity(id: "${i}"){name}}`
                 })
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: deleteQuery,
                     contentType: "application/json"
@@ -211,7 +215,7 @@
                 })
 
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: postQuery,
                     contentType: "application/json",
@@ -228,7 +232,7 @@
                 query: `{_allToursMeta{count}}`
             })
             $.ajax({
-                url: "http://localhost:3000",
+                url: graph_link,
                 type: "POST",
                 data: allTours,
                 contentType: "application/json",
@@ -247,7 +251,7 @@
                     query: `mutation {removeTour(id: "${i}"){id}}`
                 })
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: deleteQuery,
                     contentType: "application/json"
@@ -262,7 +266,7 @@
                 })
 
                 $.ajax({
-                    url: "http://localhost:3000",
+                    url: graph_link,
                     type: "POST",
                     data: postQuery,
                     contentType: "application/json",
@@ -276,7 +280,7 @@
 
         function getData() {
 
-            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (items) {
+            $.getJSON(json_link + "/tours?_expand=agency&_expand=city", function (items) {
                 items.forEach(tour => {
                     line = addLine(tour.agency.name, tour.agency.phone, tour.city.name, tour.city.country, tour.price)
                     tableBody = $("#table1 tbody");
@@ -286,7 +290,7 @@
                 })
             });
 
-            $.getJSON("http://localhost:4000/agencies", function (items) {
+            $.getJSON(json_link + "/agencies", function (items) {
                 agencies = items;
                 $.each(agencies, function (index, agency) {
                     var $option = $("<option/>", {
@@ -297,7 +301,7 @@
                 });
             })
 
-            $.getJSON("http://localhost:4000/cities", function (items) {
+            $.getJSON(json_link + "/cities", function (items) {
                 cities = items;
                 $.each(cities, function (index, city) {
                     var $option = $("<option/>", {
