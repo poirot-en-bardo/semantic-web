@@ -99,10 +99,11 @@
         async function send2() {
             await Promise.all([graphAgencies(), graphCities(), graphTours()]);
 
-            console.log(agencies2);
-            console.log(cities2);
-            console.log(tours2);
-            $("#table2 > tbody:last").children( 'tr:not(:first)' ).remove();
+            // console.log(agencies2);
+            // console.log(cities2);
+            // console.log(tours2);
+
+            $("#table2 > tbody:last").children('tr:not(:first)').remove();
             for (i = 0; i < tours2.length; i++) {
                 joinQuery = JSON.stringify({
                     query: `{Tour(id: "${i}"){price Agency{name phone} City{name country}}}`
@@ -113,7 +114,6 @@
                     data: joinQuery,
                     contentType: "application/json",
                     success: function (response) {
-                        console.log(response)
                         agency = response.data.Tour.Agency;
                         city = response.data.Tour.City;
                         line = addLine(agency?.name, agency?.phone, city?.name, city?.country, response.data.Tour?.price);
@@ -125,7 +125,6 @@
         }
 
         async function graphAgencies() {
-            console.log("ag1")
             let allAgencies = JSON.stringify({
                 query: `{_allAgenciesMeta{count}}`
             })
@@ -141,7 +140,6 @@
         }
 
         function insertAgencies(response) {
-            console.log("ag2")
             agenciesNo = response.data._allAgenciesMeta.count;
 
             for (i = agenciesNo; i >= 0; i--) {
@@ -176,7 +174,6 @@
         }
 
         async function graphCities() {
-            console.log("ct1")
             let allCities = JSON.stringify({
                 query: `{_allCitiesMeta{count}}`
             })
@@ -192,7 +189,6 @@
         }
 
         function insertCities(response) {
-            console.log("ct2")
             citiesNo = response.data._allCitiesMeta.count;
 
             for (i = citiesNo; i >= 0; i--) {
@@ -228,7 +224,6 @@
 
 
         async function graphTours() {
-            console.log("to1")
             let allTours = JSON.stringify({
                 query: `{_allToursMeta{count}}`
             })
@@ -245,7 +240,6 @@
 
 
         function insertTours(response) {
-            console.log("to2")
             toursNo = response.data._allToursMeta.count;
 
             for (i = toursNo; i >= 0; i--) {
@@ -278,36 +272,6 @@
                 });
             }
         }
-
-
-        function procesareRaspuns(raspuns) {
-            // console.log(raspuns);
-            // obiectInterogare = {query: "{Agency(id: 3){name phone}}"}
-            // textInterogare = JSON.stringify(obiectInterogare)
-            //
-            // $.ajax({
-            //     url: "http://localhost:3000",
-            //     type: "POST",
-            //     data: textInterogare,
-            //     contentType: "application/json",
-            //     success: function(raspuns){
-            //         console.log(raspuns);
-            //     }
-            // })
-
-//             textDeInserat = "<h1>Notele la cursul " + raspuns.data.Course.title + " </h1>"
-//             $("#spatiuRezervat").append(textDeInserat)
-// // am inserat intai un titlu ce include denumirea cursului
-// // apoi dedesubt realizam un for each (in sintaxa JQuery!) ce va apela functia afisareText pentru fiecare nota returnata
-//             inregistrari = raspuns.data.Course.Grades
-//             $.each(inregistrari, afisareText)
-        }
-
-        // function afisareText(indice, inregistrare) {
-        //     textDeInserat = "Studentul " + inregistrare.Student.name + " a luat nota " + inregistrare.grade + "<br/>"
-        //     $("#spatiuRezervat").append(textDeInserat)
-        //
-        // }
 
 
         function getData() {
