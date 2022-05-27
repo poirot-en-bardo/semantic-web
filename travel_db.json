@@ -63,6 +63,12 @@
       "agencyId": 3,
       "cityId": 2,
       "price": 123
+    },
+    {
+      "agencyId": 1,
+      "cityId": 2,
+      "price": 212,
+      "id": 6
     }
   ]
 }

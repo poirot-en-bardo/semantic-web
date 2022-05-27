@@ -18,25 +18,32 @@
     function CreateGraphs()
     {
         require 'vendor/autoload.php';
-        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
-        $graf=new EasyRdf\Graph("http://balicaprichici.ro#grafAgencies");
-        $prefixe=new EasyRdf\RdfNamespace();
+        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
+        $graf = new EasyRdf\Graph("http://balicaprichici.ro#grafAgencies");
+        $prefixe = new EasyRdf\RdfNamespace();
         $prefixe->setDefault("http://balicaprichici.ro#");
-        $graf->addResource("Irina","schema:knows","Petru");
-        $graf->addResource("Irina","schema:knows","Pavel");
-        $graf->add("Irina","varsta","22");
-        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/grafuri/statements");
-        print $client->insert($graf,"http://buchmann.ro#grafNou2");
+        $graf->addResource("Irina", "schema:knows", "Petru");
+        $graf->addResource("Irina", "schema:knows", "Pavel");
+        $graf->add("Irina", "varsta", "22");
+        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/grafuri/statements");
+        print $client->insert($graf, "http://buchmann.ro#grafNou2");
     }
+
     ?>
+
+
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
             getData();
         });
 
-        let agencies;
-        let cities;
+        let agencies = [];
+        let cities = [];
+        let tours = [];
+        let agencies2 = [];
+        let cities2 = [];
+        let tours2 = [];
 
         function send1() {
             let selectedAgency = null;
@@ -45,12 +52,12 @@
             let formValues = Object.fromEntries(new FormData($("#formular")[0]));
 
             agencies.forEach(agency => {
-                if(agency.id == formValues.agency) {
+                if (agency.id == formValues.agency) {
                     selectedAgency = agency;
                 }
             })
             cities.forEach(city => {
-                if(city.id == formValues.city)
+                if (city.id == formValues.city)
                     selectedCity = city;
             })
 
@@ -68,22 +75,117 @@
                 success: function (response) {
                     line = "<tr>" +
                         "<td>" + selectedAgency?.name + "</td>" +
-                        "<td>" + selectedAgency.phone + "</td>" +
+                        "<td>" + selectedAgency?.phone + "</td>" +
                         "<td>" + selectedCity?.name + "</td>" +
                         "<td>" + selectedCity?.country + "</td>" +
                         "<td>" + response.price + "</td>" +
                         "</tr>";
                     tableBody = $("#tabel1 tbody");
                     tableBody.append(line);
+
+                    tours.push({"agencyId": selectedAgency.id, "cityId": selectedCity.id, "price": response.price});
                 }
             });
         }
 
+        async function send2() {
+           const [a,c,t] = await Promise.all([insertAgencies(), insertCities(), insertTours()]);
+           //inserare date in tabel
+        }
+
+        async function insertAgencies(){
+            for (i = 1; i < agencies.length; i++) {
+                obiectInterogare = {query: `mutation {createAgency(name:"${agencies[i].name}", phone:"${agencies[i].phone}") {id name phone}}`}
+                textInterogare = JSON.stringify(obiectInterogare)
+
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: textInterogare,
+                    contentType: "application/json",
+                    success: function (response) {
+                        agencies2.push(response.data.createAgency);
+                    }
+                });
+            }
+            return 1;
+        }
+
+        async function insertCities(){
+            for (i = 1; i < cities.length; i++) {
+                obiectInterogare = {query: `mutation {createCity(name:"${cities[i].name}",
+                country:"${cities[i].country}") {id name country}}`}
+                textInterogare = JSON.stringify(obiectInterogare)
+
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: textInterogare,
+                    contentType: "application/json",
+                    success: function(response) {
+                        cities2.push(response.data.createCity);
+                    }
+                });
+            }
+            return 1;
+        }
+
+        async function insertTours(){
+            for(i = 1; i < tours.length; i++) {
+                obiectInterogare = {query: `mutation {createTour(agency_id:"${tours[i].agencyId}",
+                city_id:"${tours[i].cityId}", price:${tours[i].price}) {agency_id city_id price}}`}
+                textInterogare = JSON.stringify(obiectInterogare)
+
+                $.ajax({
+                    url: "http://localhost:3000",
+                    type: "POST",
+                    data: textInterogare,
+                    contentType: "application/json",
+                    success: function(response) {
+                        tours2.push(response.data.createTour);
+                    }
+                });
+            }
+            return 1;
+        }
+
+
+
+
+
+        function procesareRaspuns(raspuns) {
+            // console.log(raspuns);
+            // obiectInterogare = {query: "{Agency(id: 3){name phone}}"}
+            // textInterogare = JSON.stringify(obiectInterogare)
+            //
+            // $.ajax({
+            //     url: "http://localhost:3000",
+            //     type: "POST",
+            //     data: textInterogare,
+            //     contentType: "application/json",
+            //     success: function(raspuns){
+            //         console.log(raspuns);
+            //     }
+            // })
+
+//             textDeInserat = "<h1>Notele la cursul " + raspuns.data.Course.title + " </h1>"
+//             $("#spatiuRezervat").append(textDeInserat)
+// // am inserat intai un titlu ce include denumirea cursului
+// // apoi dedesubt realizam un for each (in sintaxa JQuery!) ce va apela functia afisareText pentru fiecare nota returnata
+//             inregistrari = raspuns.data.Course.Grades
+//             $.each(inregistrari, afisareText)
+        }
+
+        // function afisareText(indice, inregistrare) {
+        //     textDeInserat = "Studentul " + inregistrare.Student.name + " a luat nota " + inregistrare.grade + "<br/>"
+        //     $("#spatiuRezervat").append(textDeInserat)
+        //
+        // }
 
         function getData() {
 
-            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (tours) {
-                tours.forEach(tour => {
+            $.getJSON("http://localhost:4000/tours?_expand=agency&_expand=city", function (items) {
+                items.forEach(tour => {
                     line = "<tr>" +
                         "<td>" + tour.agency.name + "</td>" +
                         "<td>" + tour.agency.phone + "</td>" +
@@ -93,6 +195,8 @@
                         "</tr>";
                     tableBody = $("#tabel1 tbody");
                     tableBody.append(line);
+
+                    tours.push({"agencyId": tour.agency.id, "cityId":tour.city.id, "price":tour.price})
                 })
             });
 

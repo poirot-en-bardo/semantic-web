@@ -1,0 +1,24 @@
+{
+  "agencies": [
+    {
+      "id": 1,
+      "name": "Aero Trip",
+      "phone": "0724315423"
+    }
+  ],
+  "cities": [
+    {
+      "id": 1,
+      "name": "Paris",
+      "country": "France"
+    }
+  ],
+  "tours": [
+    {
+      "id": 1,
+      "agency_id": 1,
+      "city_id": 1,
+      "price": 700
+    }
+  ]
+}
