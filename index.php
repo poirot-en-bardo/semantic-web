@@ -22,13 +22,13 @@
         $graf = new EasyRdf\Graph("http://balicaprichici.ro#grafAgencies");
         $prefixe = new EasyRdf\RdfNamespace();
         $prefixe->setDefault("http://balicaprichici.ro#");
-        $graf->addResource("Irina", "schema:knows", "Petru");
-        $graf->addResource("Irina", "schema:knows", "Pavel");
-        $graf->add("Irina", "varsta", "22");
-        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/grafuri/statements");
-        print $client->insert($graf, "http://buchmann.ro#grafNou2");
+        //$data=json_decode($rezultatJSON)->results->bindings;
+        $graf->addResource("Irina","schema:knows","Petru");
+        $graf->addResource("Irina","schema:knows","Pavel");
+        $graf->add("Irina","varsta","22");
+        $client=new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
+        print $client->insert($graf,"http://balicaprichici.ro#grafNou2");
     }
-
     ?>
 
 
@@ -88,9 +88,20 @@
             });
         }
 
+
+        function addline (agname, agphone, ctname, ctcountry, price) {
+            line = "<tr>" +
+                "<td>" + agname + "</td>" +
+                "<td>" + agphone + "</td>" +
+                "<td>" + ctname + "</td>" +
+                "<td>" + ctcountry + "</td>" +
+                "<td>" + price + "</td>" +
+                "</tr>";
+            return line;
+        }
         async function send2() {
-           const [a,c,t] = await Promise.all([insertAgencies(), insertCities(), insertTours()]);
-           //inserare date in tabel
+            const [a,c,t] = await Promise.all([insertAgencies(), insertCities(), insertTours()]);
+            //inserare date in tabel
         }
 
         async function insertAgencies(){
@@ -149,10 +160,6 @@
             return 1;
         }
 
-
-
-
-
         function procesareRaspuns(raspuns) {
             // console.log(raspuns);
             // obiectInterogare = {query: "{Agency(id: 3){name phone}}"}
@@ -181,6 +188,7 @@
         //     $("#spatiuRezervat").append(textDeInserat)
         //
         // }
+
 
         function getData() {
 
