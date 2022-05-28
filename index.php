@@ -180,36 +180,54 @@
 
         async function insertAgencies(response) {
             agenciesNo = response.data._allAgenciesMeta.count;
+            let promises = []
+             async function deleteAg(i) {
+                 return new Promise(resolve => {
+                     deleteQuery = JSON.stringify({
+                         query: `mutation {removeAgency(id: "${i}"){name}}`
+                     })
+                     $.ajax({
+                         url: graph_link,
+                         type: "POST",
+                         data: deleteQuery,
+                         contentType: "application/json",
+                         success: () => resolve()
+                     })
+                 })
+            }
 
             for (i = agenciesNo; i >= 0; i--) {
-                deleteQuery = JSON.stringify({
-                    query: `mutation {removeAgency(id: "${i}"){name}}`
-                })
-                $.ajax({
-                    url: graph_link,
-                    type: "POST",
-                    data: deleteQuery,
-                    contentType: "application/json"
-                })
+                promises.push(deleteAg(i))
             }
 
+            await Promise.all(promises);
+
+            promises = []
             agencies2 = []
-            for (i = 0; i < agencies.length; i++) {
-                postQuery = JSON.stringify({
-                    query: `mutation {createAgency(name:"${agencies[i].name}",
-                                        phone:"${agencies[i].phone}") {id name phone}}`
-                })
 
-                $.ajax({
-                    url: graph_link,
-                    type: "POST",
-                    data: postQuery,
-                    contentType: "application/json",
-                    success: function (response) {
-                        agencies2.push(response.data.createAgency);
-                    }
-                });
+            async function insert(agency) {
+
+                let response = await requestGraph({query: `mutation {createAgency(name:"${agency.name}",
+                                        phone:"${agency.phone}") {id name phone}}`})
+                agencies2.push(response.data.createAgency)
             }
+            promises = agencies.map((agency, index) => insert(agency))
+
+            await Promise.all(promises)
+        }
+
+        function requestGraph(data) {
+           return new Promise(resolve => {
+               $.ajax({
+                   url: graph_link,
+                   type: "POST",
+                   data: JSON.stringify(data),
+                   contentType: "application/json",
+                   success: function (response) {
+                       resolve(response)
+                   }
+               });
+           })
         }
 
         async function graphCities() {
