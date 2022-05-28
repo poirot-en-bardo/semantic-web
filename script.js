@@ -91,10 +91,6 @@ function send1() {
 async function send2() {
     await Promise.all([graphAgencies(), graphCities(), graphTours()]);
 
-    console.log(agencies2);
-    console.log(cities2);
-    console.log(tours2);
-    console.log(tours2.length)
     $("#table2 > tbody:last").children('tr:not(:first)').remove();
     for (i = 0; i < tours2.length; i++) {
         joinQuery = JSON.stringify({
