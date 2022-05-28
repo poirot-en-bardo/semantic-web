@@ -13,6 +13,10 @@
         input {
             margin: 10px;
         }
+
+        .table {
+            border: 1px solid;
+        }
     </style>
     <?php
     function CreateGraphs()
@@ -48,7 +52,43 @@
         const json_link = "http://localhost:4000"
         const graph_link = "http://localhost:3000"
         const rdf_link = "http://localhost:8080"
+        const api_link = "http://www.boredapi.com/api/activity/"
 
+
+        function getData() {
+
+            $.getJSON(json_link + "/tours?_expand=agency&_expand=city", function (items) {
+                items.forEach(tour => {
+                    line = addLine(tour.agency.name, tour.agency.phone, tour.city.name, tour.city.country, tour.price)
+                    tableBody = $("#table1 tbody");
+                    tableBody.append(line);
+
+                    tours.push({"agencyId": tour.agency.id, "cityId": tour.city.id, "price": tour.price})
+                })
+            });
+
+            $.getJSON(json_link + "/agencies", function (items) {
+                agencies = items;
+                $.each(agencies, function (index, agency) {
+                    var $option = $("<option/>", {
+                        value: agency.id,
+                        text: agency.name
+                    });
+                    $('#agency').append($option);
+                });
+            })
+
+            $.getJSON(json_link + "/cities", function (items) {
+                cities = items;
+                $.each(cities, function (index, city) {
+                    var $option = $("<option/>", {
+                        value: city.id,
+                        text: city.name
+                    });
+                    $('#city').append($option);
+                });
+            })
+        }
 
         function send1() {
             let selectedAgency = null;
@@ -89,17 +129,6 @@
         }
 
 
-        function addLine(agname, agphone, ctname, ctcountry, price) {
-            line = "<tr>" +
-                "<td>" + agname + "</td>" +
-                "<td>" + agphone + "</td>" +
-                "<td>" + ctname + "</td>" +
-                "<td>" + ctcountry + "</td>" +
-                "<td>" + price + "</td>" +
-                "</tr>";
-            return line;
-        }
-
         async function send2() {
             await Promise.all([graphAgencies(), graphCities(), graphTours()]);
 
@@ -129,21 +158,27 @@
         }
 
         async function graphAgencies() {
-            let allAgencies = JSON.stringify({
-                query: `{_allAgenciesMeta{count}}`
-            })
-            $.ajax({
-                url: graph_link,
-                type: "POST",
-                data: allAgencies,
-                contentType: "application/json",
-                success: insertAgencies
+            return new Promise((resolve) => {
+                let allAgencies = JSON.stringify({
+                    query: `{_allAgenciesMeta{count}}`
+                })
+                $.ajax({
+                    url: graph_link,
+                    type: "POST",
+                    data: allAgencies,
+                    contentType: "application/json",
+                    success: async function (response) {
+                        await insertAgencies(response)
+                        resolve()
+                    }
+                })
+
+                return 1;
             })
 
-            return 1;
         }
 
-        function insertAgencies(response) {
+        async function insertAgencies(response) {
             agenciesNo = response.data._allAgenciesMeta.count;
 
             for (i = agenciesNo; i >= 0; i--) {
@@ -277,41 +312,33 @@
             }
         }
 
-
-        function getData() {
-
-            $.getJSON(json_link + "/tours?_expand=agency&_expand=city", function (items) {
-                items.forEach(tour => {
-                    line = addLine(tour.agency.name, tour.agency.phone, tour.city.name, tour.city.country, tour.price)
-                    tableBody = $("#table1 tbody");
+        function apiCall() {
+            for (i = 0; i < 2; i++) {
+                $.getJSON(api_link, function (response) {
+                    line = "<tr>" +
+                        "<td>" + response.activity + "</td>" +
+                        "<td>" + response.type + "</td>" +
+                        "<td>" + response.participants + "</td>" +
+                        "<td>" + response.price + "</td>" +
+                        "</tr>";
+                    tableBody = $("#table4 tbody");
                     tableBody.append(line);
-
-                    tours.push({"agencyId": tour.agency.id, "cityId": tour.city.id, "price": tour.price})
                 })
-            });
+            }
 
-            $.getJSON(json_link + "/agencies", function (items) {
-                agencies = items;
-                $.each(agencies, function (index, agency) {
-                    var $option = $("<option/>", {
-                        value: agency.id,
-                        text: agency.name
-                    });
-                    $('#agency').append($option);
-                });
-            })
-
-            $.getJSON(json_link + "/cities", function (items) {
-                cities = items;
-                $.each(cities, function (index, city) {
-                    var $option = $("<option/>", {
-                        value: city.id,
-                        text: city.name
-                    });
-                    $('#city').append($option);
-                });
-            })
         }
+
+        function addLine(agname, agphone, ctname, ctcountry, price) {
+            line = "<tr>" +
+                "<td>" + agname + "</td>" +
+                "<td>" + agphone + "</td>" +
+                "<td>" + ctname + "</td>" +
+                "<td>" + ctcountry + "</td>" +
+                "<td>" + price + "</td>" +
+                "</tr>";
+            return line;
+        }
+
     </script>
 </head>
 <body>
@@ -339,7 +366,7 @@
 
 <div>
     <h2>Date returnate:</h2>
-    <table id="table1">
+    <table class="table" id="table1">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
@@ -347,15 +374,14 @@
             <th>Tara</th>
             <th>Pret excursie</th>
         </tr>
-        <tr></tr>
     </table>
 </div>
 <div>
-    <button class="sendButton" onclick="send2()">Trimite catre Serverul Y</button>
+    <button class="sendButton" onclick="send2()">Trimite catre GraphQL Server</button>
 </div>
 
 <div>
-    <table id="table2">
+    <table class="table" id="table2">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
@@ -363,18 +389,15 @@
             <th>Tara</th>
             <th>Pret excursie</th>
         </tr>
-        <tr></tr>
-        <tr></tr>
-        <tr></tr>
     </table>
 </div>
 
 <div>
-    <button class="sendButton" onclick="trimite3()">Trimite catre Serverul Z</button>
+    <button class="sendButton" onclick="trimite3()">Trimite catre RDF4J Server</button>
 </div>
 
 <div>
-    <table id="table3">
+    <table class="table" id="table3">
         <tr>
             <th>Agentie</th>
             <th>Telefon</th>
@@ -382,9 +405,22 @@
             <th>Tara</th>
             <th>Pret excursie</th>
         </tr>
-        <tr></tr>
-        <tr></tr>
-        <tr></tr>
+    </table>
+</div>
+
+<div>
+    <button class="sendButton" onclick="apiCall()">API Call</button>
+</div>
+
+<div>
+    API Random Activities
+    <table class="table" id="table4">
+        <tr>
+            <th>Activity</th>
+            <th>Type</th>
+            <th>Participants</th>
+            <th>Price</th>
+        </tr>
     </table>
 </div>
 
