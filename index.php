@@ -26,8 +26,6 @@
 <body>
 
 
-<img src="autobar.jpeg" height="430" width="800">
-
 <h2>Introduceti datele:</h2>
 
 <form id="formular">
