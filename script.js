@@ -316,8 +316,6 @@ function send3() {
         contentType: "application/json",
         success: function (response) {
             var len=response.length;
-            //console.log(response);
-            //console.log(response.tour.length);
             response.tour.forEach(tour=>
             {
                 line=addLine(tour.agentie.substr(25), tour.telefon.substr(25), tour.oras.substr(25), tour.tara.substr(25), tour.pret.substr(25));
