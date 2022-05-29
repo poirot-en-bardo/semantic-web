@@ -309,11 +309,6 @@ function addLine(agname, agphone, ctname, ctcountry, price) {
 }
 
 function send3() {
-    //adresa="php.php";
-    //fetch("php.php")
-    //    .then(result => result.json())
-    //    .then((raspuns) => { console.log(JSON.stringify(raspuns)); });
-    //$.post(adresa, procesareRaspuns);
     $.ajax({
         url: rdf_link,
         type: "GET",
@@ -331,8 +326,4 @@ function send3() {
             })
         }
     })
-}
-function procesareRaspuns(raspuns)
-{
-    console.log(raspuns);
 }
