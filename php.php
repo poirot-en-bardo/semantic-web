@@ -8,6 +8,18 @@ $prefixe = new EasyRdf\RdfNamespace();
 $prefixe->setDefault("http://balicaprichici.ro#");
 \EasyRdf\RdfNamespace::set('ag', "http://balicaprichiciag.ro#");
 
+$interogare="prefix : <http://balicaprichici.ro#> DELETE WHERE {GRAPH :grafExcursii {?x ?y ?z}}";
+$client->update($interogare);
+
+$interogare="prefix : <http://balicaprichici.ro#> DELETE WHERE {GRAPH :grafActivitati {?x ?y ?z}}";
+$client->update($interogare);
+
+$interogare="prefix : <http://balicaprichici.ro#> DELETE WHERE {GRAPH :grafOrase {?x ?y ?z}}";
+$client->update($interogare);
+
+
+
+
 $spaceID = "mt0pmhki5db7";
 $accessToken = "8c7dbd270cb98e83f9d8d57fb8a2ab7bac9d7501905fb013c69995ebf1b2a719";
 
@@ -40,7 +52,7 @@ $context = stream_context_create($options);
 $result = file_get_contents(sprintf($endpoint, $spaceID), false, $context);
 
 if ($result === FALSE) {
-    echo "cf";
+    echo "Interogarea nu poate fi executata.";
 }
 $json = json_decode($result, true);
 $json = $json['data']['allTours'];
@@ -88,15 +100,9 @@ $prefixe->setDefault("http://balicaprichici.ro#");
 $interogare = "prefix : <http://balicaprichici.ro#> SELECT ?pret ?agentie ?tel ?oras ?tara {?x :pret ?pret. ?x :este_organizat_de ?y. ?agentie schema:identifier ?y. ?agentie :nr_tel ?tel. ?x :este_organizat_in ?z. ?oras schema:identifier ?z. ?oras :is_in ?tara}";
 $rezultate = $client->query($interogare);
 $detrimis = array('tour' => array());
-//echo "DIN PHP";
 foreach ($rezultate as $rezultat) {
-//    $tour=array();
     $newdata = array('pret' => $rezultat->pret . '', 'telefon' => $rezultat->tel . '', 'agentie' => $rezultat->agentie . '', 'oras' => $rezultat->oras . '', 'tara' => $rezultat->tara . '');
     array_push($detrimis['tour'], $newdata);
-    //print_r($detrimis['tour'][0]);
-//echo "Agentia ".$rezultat->agentie." are numarul de telefon ".$rezultat->tel." si organizeaza o excursie in ".$rezultat->oras.",".$rezultat->tara." la pretul de ".$rezultat->pret."<br/>";
-
 }
 print json_encode($detrimis);
-//echo "/DIN PHP";
 ?>

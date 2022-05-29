@@ -309,16 +309,16 @@ function addLine(agname, agphone, ctname, ctcountry, price) {
 }
 
 function send3() {
+    $("#table3 > tbody:last").children('tr:not(:first)').remove();
     $.ajax({
         url: rdf_link,
         type: "GET",
         dataType: 'JSON',
         contentType: "application/json",
         success: function (response) {
-            var len=response.length;
-            response.tour.forEach(tour=>
-            {
-                line=addLine(tour.agentie.substr(25), tour.telefon.substr(25), tour.oras.substr(25), tour.tara.substr(25), tour.pret.substr(25));
+            var len = response.length;
+            response.tour.forEach(tour => {
+                line = addLine(tour.agentie.substr(25), tour.telefon.substr(25), tour.oras.substr(25), tour.tara.substr(25), tour.pret.substr(25));
                 tableBody = $("#table3 tbody");
                 tableBody.append(line);
             })
