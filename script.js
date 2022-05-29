@@ -85,6 +85,10 @@ function send1() {
             tours.push({"agencyId": selectedAgency.id, "cityId": selectedCity.id, "price": response.price});
         }
     });
+    if (formValues.price == "") {
+        alert("Va rugam sa introduceti un pret");
+        return false;
+    }
 }
 
 
@@ -296,4 +300,14 @@ function addLine(agname, agphone, ctname, ctcountry, price) {
         "<td>" + price + "</td>" +
         "</tr>";
     return line;
+}
+
+function send3()
+{
+    adresa="php.php";
+    $.post(adresa, procesareRaspuns);
+}
+function procesareRaspuns(raspuns)
+{
+    console.log("ceva");
 }

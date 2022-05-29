@@ -18,24 +18,6 @@
             border: 1px solid;
         }
     </style>
-    <?php
-    function CreateGraphs()
-    {
-        require 'vendor/autoload.php';
-        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
-        $graf = new EasyRdf\Graph("http://balicaprichici.ro#grafAgencies");
-        $prefixe = new EasyRdf\RdfNamespace();
-        $prefixe->setDefault("http://balicaprichici.ro#");
-        //$data=json_decode($rezultatJSON)->results->bindings;
-        $graf->addResource("Irina", "schema:knows", "Petru");
-        $graf->addResource("Irina", "schema:knows", "Pavel");
-        $graf->add("Irina", "varsta", "22");
-        $client = new EasyRdf\Sparql\Client("http://localhost:8080/rdf4j-server/repositories/proiect/statements");
-        print $client->insert($graf, "http://balicaprichici.ro#grafNou2");
-    }
-
-    ?>
-
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript" src = "script.js"></script>
@@ -92,7 +74,7 @@
 </div>
 
 <div>
-    <button class="sendButton" onclick="trimite3()">Trimite catre RDF4J Server</button>
+    <button class="sendButton" onclick="send3()">Trimite catre RDF4J Server</button>
 </div>
 
 <div>
