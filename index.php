@@ -38,12 +38,12 @@
 
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script type="text/javascript" src = "script.js"></script>
+    <script src="script.js"></script>
+
+
 </head>
 <body>
 
-
-<img src="autobar.jpeg" height="430" width="800">
 
 <h2>Introduceti datele:</h2>
 

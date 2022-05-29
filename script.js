@@ -21,7 +21,6 @@ function getData() {
             line = addLine(tour.agency.name, tour.agency.phone, tour.city.name, tour.city.country, tour.price)
             tableBody = $("#table1 tbody");
             tableBody.append(line);
-
             tours.push({"agencyId": tour.agency.id, "cityId": tour.city.id, "price": tour.price})
         })
     });
@@ -55,6 +54,11 @@ function send1() {
     let sendObject;
     let formValues = Object.fromEntries(new FormData($("#formular")[0]));
 
+    if (formValues.price == "") {
+        alert("Va rugam sa introduceti un pret");
+        return false;
+    }
+
     agencies.forEach(agency => {
         if (agency.id == formValues.agency) {
             selectedAgency = agency;
@@ -77,16 +81,15 @@ function send1() {
         data: JSON.stringify(sendObject),
         contentType: "application/json",
         success: function (response) {
-            line = addLine(selectedAgency?.name, selectedAgency?.phone, selectedCity?.name, selectedCity?.country,
+            let line = addLine(selectedAgency?.name, selectedAgency?.phone, selectedCity?.name, selectedCity?.country,
                 response.price)
-            tableBody = $("#table1 tbody");
+            let tableBody = $("#table1 tbody");
             tableBody.append(line);
 
             tours.push({"agencyId": selectedAgency.id, "cityId": selectedCity.id, "price": response.price});
         }
     });
 }
-
 
 async function send2() {
     await Promise.all([graphAgencies(), graphCities(), graphTours()]);
@@ -102,8 +105,8 @@ async function send2() {
             data: joinQuery,
             contentType: "application/json",
             success: function (response) {
-                agency = response.data.Tour.Agency;
-                city = response.data.Tour.City;
+                let agency = response.data.Tour.Agency;
+                let city = response.data.Tour.City;
                 line = addLine(agency?.name, agency?.phone, city?.name, city?.country, response.data.Tour?.price);
                 tableBody = $("#table2 tbody");
                 tableBody.append(line);
@@ -161,6 +164,7 @@ async function insertAgencies(response) {
 
     promises = []
     agencies2 = []
+
     async function insert(agency) {
 
         let response = await requestGraph({
@@ -173,7 +177,6 @@ async function insertAgencies(response) {
     promises = agencies.map((agency, index) => insert(agency))
     await Promise.all(promises)
 }
-
 
 
 async function graphCities() {
@@ -211,6 +214,7 @@ async function insertCities(response) {
 
     promises = []
     cities2 = []
+
     async function insert(city) {
 
         let response = await requestGraph({
@@ -235,7 +239,7 @@ async function graphTours() {
             type: "POST",
             data: allTours,
             contentType: "application/json",
-            success: async function(response) {
+            success: async function (response) {
                 await insertTours(response);
                 resolve();
             }
@@ -261,6 +265,7 @@ async function insertTours(response) {
 
     promises = []
     tours2 = []
+
     async function insert(tour) {
         let response = await requestGraph({
             query: `mutation {createTour(agency_id: "${tour.agencyId}",
@@ -268,6 +273,7 @@ async function insertTours(response) {
         })
         tours2.push(response.data.createTour)
     }
+
     promises = tours.map((tour, index) => insert(tour))
     await Promise.all(promises)
 }
