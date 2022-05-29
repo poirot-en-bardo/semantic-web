@@ -81,6 +81,12 @@
       "cityId": 2,
       "price": 99,
       "id": 7
+    },
+    {
+      "agencyId": 2,
+      "cityId": 1,
+      "price": 78,
+      "id": 8
     }
   ]
 }

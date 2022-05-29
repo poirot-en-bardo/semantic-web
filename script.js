@@ -10,7 +10,7 @@ let cities2 = [];
 let tours2 = [];
 const json_link = "http://localhost:4000"
 const graph_link = "http://localhost:3000"
-const rdf_link = "http://localhost:8080"
+const rdf_link = "php.php"
 const api_link = "http://www.boredapi.com/api/activity/"
 
 
@@ -308,12 +308,31 @@ function addLine(agname, agphone, ctname, ctcountry, price) {
     return line;
 }
 
-function send3()
-{
-    adresa="php.php";
-    $.post(adresa, procesareRaspuns);
+function send3() {
+    //adresa="php.php";
+    //fetch("php.php")
+    //    .then(result => result.json())
+    //    .then((raspuns) => { console.log(JSON.stringify(raspuns)); });
+    //$.post(adresa, procesareRaspuns);
+    $.ajax({
+        url: rdf_link,
+        type: "GET",
+        dataType: 'JSON',
+        contentType: "application/json",
+        success: function (response) {
+            var len=response.length;
+            //console.log(response);
+            //console.log(response.tour.length);
+            response.tour.forEach(tour=>
+            {
+                line=addLine(tour.agentie.substr(25), tour.telefon.substr(25), tour.oras.substr(25), tour.tara.substr(25), tour.pret.substr(25));
+                tableBody = $("#table3 tbody");
+                tableBody.append(line);
+            })
+        }
+    })
 }
 function procesareRaspuns(raspuns)
 {
-    console.log("ceva");
+    console.log(raspuns);
 }
