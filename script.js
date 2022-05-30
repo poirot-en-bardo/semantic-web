@@ -282,19 +282,47 @@ async function insertTours(response) {
     await Promise.all(promises)
 }
 
-function apiCall() {
-    for (i = 0; i < 2; i++) {
-        $.getJSON(api_link, function (response) {
-            line = "<tr>" +
-                "<td>" + response.activity + "</td>" +
-                "<td>" + response.type + "</td>" +
-                "<td>" + response.participants + "</td>" +
-                "<td>" + response.price + "</td>" +
-                "</tr>";
-            tableBody = $("#table4 tbody");
-            tableBody.append(line);
+async function apiHandler() {
+    let promises = []
+    let data = []
+
+    async function apiCall() {
+        return new Promise(resolve => {
+            $.ajax({
+                    url: api_link,
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function (response) {
+                        data.push(response)
+                        line = "<tr>" +
+                            "<td>" + response.activity + "</td>" +
+                            "<td>" + response.type + "</td>" +
+                            "<td>" + response.participants + "</td>" +
+                            "<td>" + response.price + "</td>" +
+                            "</tr>";
+                        tableBody = $("#table4 tbody");
+                        tableBody.append(line);
+                        resolve(response);
+                    }
+                }
+            )
         })
     }
+
+    for (i = 0; i < 2; i++) {
+        promises.push(apiCall());
+    }
+    await Promise.all(promises);
+    console.log(data)
+    $.ajax({
+        url: "api.php",
+        type: "POST",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function (response) {
+            console.log(response)
+        }
+    })
 }
 
 function addLine(agname, agphone, ctname, ctcountry, price) {

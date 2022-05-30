@@ -64,6 +64,8 @@ foreach ($json as $field => $value) {
     $graf->addResource($name . '', "nr_tel", '' . $value['Agency']['phone'] . '');
 }
 $client->insert($graf, "http://balicaprichici.ro#grafAgentii");
+
+
 $graf = new EasyRdf\Graph("http://balicaprichici.ro#grafOrase");
 $prefixe = new EasyRdf\RdfNamespace();
 $prefixe->setDefault("http://balicaprichici.ro#");
